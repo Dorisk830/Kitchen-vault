@@ -6,7 +6,6 @@ const featureImageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // You can add other fields such as user or product associations here
 });
 
 const FeatureImage = mongoose.model('FeatureImage', featureImageSchema);
