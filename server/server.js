@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
@@ -16,9 +17,10 @@ const commonFeatureRouter = require("./routes/common/feature-routes");
 
 //create a database connection -> u can also
 //create a separate file for this and then import/use that file here
+const mongoURI = process.env.MONGO_URI;
 
-mongoose.connect("mongodb+srv://Doris:Doris@kitchen-vault.wosll.mongodb.net/kitchen-vault?retryWrites=true&w=majority")
-  .then(() => console.log("Connected to MongoDB"))
+mongoose.connect(mongoURI)
+  .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
 const app = express();

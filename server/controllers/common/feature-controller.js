@@ -1,4 +1,3 @@
-
 const Feature = require("../../models/Feature");
 
 const addFeatureImage = async (req, res) => {
@@ -43,4 +42,32 @@ const getFeatureImages = async (req, res) => {
   }
 };
 
-module.exports = { addFeatureImage, getFeatureImages };
+// Delete Feature Image
+const deleteFeatureImage = async (req, res) => {
+  try {
+    const { id } = req.params; // Get the image ID from the URL parameters
+
+    // Find and delete the image from the database
+    const deletedImage = await Feature.findByIdAndDelete(id);
+
+    if (!deletedImage) {
+      return res.status(404).json({
+        success: false,
+        message: "Image not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Image deleted successfully",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting image",
+    });
+  }
+};
+
+module.exports = { addFeatureImage, getFeatureImages, deleteFeatureImage };

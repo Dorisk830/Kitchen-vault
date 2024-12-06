@@ -1,6 +1,6 @@
 import ProductImageUpload from "@/components/admin-view/image-upload";
 import { Button } from "@/components/ui/button";
-import { addFeatureImage, getFeatureImages } from "@/store/common-slice";
+import { addFeatureImage, getFeatureImages, deleteFeatureImage } from "@/store/common-slice";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -11,17 +11,8 @@ function AdminDashboard() {
   const dispatch = useDispatch();
   const { featureImageList } = useSelector((state) => state.commonFeature);
 
-  useEffect(() => {
-    // Fetch feature images on component mount
-    dispatch(getFeatureImages());
-  }, [dispatch]);
-
+  // Handle image upload
   function handleUploadFeatureImage() {
-    if (!uploadedImageUrl) {
-      alert("Please upload an image before clicking upload.");
-      return;
-    }
-
     dispatch(addFeatureImage(uploadedImageUrl)).then((data) => {
       if (data?.payload?.success) {
         dispatch(getFeatureImages());
@@ -31,9 +22,21 @@ function AdminDashboard() {
     });
   }
 
+  // Handle delete image
+  function handleDeleteFeatureImage(imageId) {
+    dispatch(deleteFeatureImage(imageId)).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(getFeatureImages());  // Reload images after delete
+      }
+    });
+  }
+
+  useEffect(() => {
+    dispatch(getFeatureImages());
+  }, [dispatch]);
+
   return (
-    <div className="p-6">
-      {/* Image Upload Component */}
+    <div>
       <ProductImageUpload
         imageFile={imageFile}
         setImageFile={setImageFile}
@@ -43,29 +46,29 @@ function AdminDashboard() {
         imageLoadingState={imageLoadingState}
         isCustomStyling={true}
       />
-
-      {/* Upload Button */}
       <Button onClick={handleUploadFeatureImage} className="mt-5 w-full">
         Upload
       </Button>
 
-      {/* Feature Images Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-        {Array.isArray(featureImageList) && featureImageList.length > 0 ? (
-          featureImageList.map((featureImgItem, index) => (
-            <div className="relative" key={index}>
-              <img
-                src={featureImgItem.image || "/path/to/fallback-image.jpg"}
-                alt={`Feature ${index + 1}`}
-                className="w-full h-[300px] object-cover rounded-lg shadow-md"
-              />
-            </div>
-          ))
-        ) : (
-          <p className="text-center text-gray-500 col-span-full">
-            No feature images available.
-          </p>
-        )}
+      <div className="flex flex-col gap-4 mt-5">
+        {featureImageList && featureImageList.length > 0
+          ? featureImageList.map((featureImgItem) => (
+              <div className="relative" key={featureImgItem._id}>
+                <img
+                  src={featureImgItem.image}
+                  className="w-full h-[300px] object-cover rounded-t-lg"
+                  alt="Feature"
+                />
+                {/* Delete Button */}
+                <button
+                  onClick={() => handleDeleteFeatureImage(featureImgItem._id)} // Pass the image ID to delete
+                  className="absolute bottom-4 right-4 bg-black text-white py-2 px-4 rounded-full hover:bg-gray-800 transition duration-300"
+                >
+                  Delete
+                </button>
+              </div>
+            ))
+          : null}
       </div>
     </div>
   );
