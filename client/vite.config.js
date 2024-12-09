@@ -6,7 +6,7 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   watch: {
-    usePolling: true,
+    usePolling: true, // Use this if changes aren't being detected
   },
   resolve: {
     alias: {

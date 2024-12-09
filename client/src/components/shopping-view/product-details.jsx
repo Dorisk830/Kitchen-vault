@@ -1,5 +1,4 @@
-/* eslint-disable react/jsx-key */
-import { StarIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -11,8 +10,8 @@ import { useToast } from "../ui/use-toast";
 import { setProductDetails } from "@/store/shop/products-slice";
 import { Label } from "../ui/label";
 import StarRatingComponent from "../common/star-rating";
-import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
+import PropTypes from "prop-types";  // Import PropTypes for validation
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
@@ -25,8 +24,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const { toast } = useToast();
 
   function handleRatingChange(getRating) {
-    console.log(getRating, "getRating");
-
     setRating(getRating);
   }
 
@@ -95,9 +92,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
 
   useEffect(() => {
     if (productDetails !== null) dispatch(getReviews(productDetails?._id));
-  }, [productDetails]);
-
-  console.log(reviews, "reviews");
+  }, [dispatch, productDetails]); 
 
   const averageReview =
     reviews && reviews.length > 0
@@ -170,8 +165,8 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             <h2 className="text-xl font-bold mb-4">Reviews</h2>
             <div className="grid gap-6">
               {reviews && reviews.length > 0 ? (
-                reviews.map((reviewItem) => (
-                  <div className="flex gap-4">
+                reviews.map((reviewItem, index) => (
+                  <div key={index} className="flex gap-4">
                     <Avatar className="w-10 h-10 border">
                       <AvatarFallback>
                         {reviewItem?.userName[0].toUpperCase()}
@@ -221,5 +216,19 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     </Dialog>
   );
 }
+
+ProductDetailsDialog.propTypes = {
+  open: PropTypes.bool.isRequired,
+  setOpen: PropTypes.func.isRequired,
+  productDetails: PropTypes.shape({
+    _id: PropTypes.string,
+    image: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    salePrice: PropTypes.number,
+    price: PropTypes.number,
+    totalStock: PropTypes.number,
+  }),
+};
 
 export default ProductDetailsDialog;

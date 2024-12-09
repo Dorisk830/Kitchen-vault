@@ -1,10 +1,11 @@
+import PropTypes from "prop-types";
+import { useEffect, useRef } from "react";
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { useEffect, useRef } from "react";
 import { Button } from "../ui/button";
-import axios from "axios";
 import { Skeleton } from "../ui/skeleton";
+import axios from "axios";
 
 function ProductImageUpload({
   imageFile,
@@ -18,14 +19,11 @@ function ProductImageUpload({
 }) {
   const inputRef = useRef(null);
 
-  console.log(isEditMode, "isEditMode");
-
   function handleImageFileChange(event) {
-    console.log(event.target.files, "event.target.files");
     const selectedFile = event.target.files?.[0];
-    console.log(selectedFile);
-
-    if (selectedFile) setImageFile(selectedFile);
+    if (selectedFile) {
+      setImageFile(selectedFile);
+    }
   }
 
   function handleDragOver(event) {
@@ -35,7 +33,9 @@ function ProductImageUpload({
   function handleDrop(event) {
     event.preventDefault();
     const droppedFile = event.dataTransfer.files?.[0];
-    if (droppedFile) setImageFile(droppedFile);
+    if (droppedFile) {
+      setImageFile(droppedFile);
+    }
   }
 
   function handleRemoveImage() {
@@ -46,17 +46,24 @@ function ProductImageUpload({
   }
 
   async function uploadImageToCloudinary() {
+    if (!imageFile) return;
+
     setImageLoadingState(true);
     const data = new FormData();
     data.append("my_file", imageFile);
-    const response = await axios.post(
-      "http://localhost:5000/api/admin/products/upload-image",
-      data
-    );
-    console.log(response, "response");
 
-    if (response?.data?.success) {
-      setUploadedImageUrl(response.data.result.url);
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/admin/products/upload-image",
+        data
+      );
+
+      if (response?.data?.success) {
+        setUploadedImageUrl(response.data.result.url); // Set the uploaded image URL
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
       setImageLoadingState(false);
     }
   }
@@ -65,17 +72,20 @@ function ProductImageUpload({
     if (imageFile !== null) uploadImageToCloudinary();
   }, [imageFile]);
 
+  useEffect(() => {
+    if (uploadedImageUrl) {
+      console.log("Uploaded Image URL:", uploadedImageUrl);
+      // You can add any logic that uses the uploaded URL here
+    }
+  }, [uploadedImageUrl]);
+
   return (
-    <div
-      className={`w-full  mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}
-    >
+    <div className={`w-full mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}>
       <Label className="text-lg font-semibold mb-2 block">Upload Image</Label>
       <div
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        className={`${
-          isEditMode ? "opacity-60" : ""
-        } border-2 border-dashed rounded-lg p-4`}
+        className={`${isEditMode ? "opacity-60" : ""} border-2 border-dashed rounded-lg p-4`}
       >
         <Input
           id="image-upload"
@@ -88,9 +98,7 @@ function ProductImageUpload({
         {!imageFile ? (
           <Label
             htmlFor="image-upload"
-            className={`${
-              isEditMode ? "cursor-not-allowed" : ""
-            } flex flex-col items-center justify-center h-32 cursor-pointer`}
+            className={`${isEditMode ? "cursor-not-allowed" : ""} flex flex-col items-center justify-center h-32 cursor-pointer`}
           >
             <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
             <span>Drag & drop or click to upload image</span>
@@ -115,8 +123,26 @@ function ProductImageUpload({
           </div>
         )}
       </div>
+
+      {uploadedImageUrl && (
+        <div>
+          <h3 className="text-md font-semibold mt-4">Uploaded Image:</h3>
+          <img src={uploadedImageUrl} alt="Uploaded" className="w-32 h-32 object-cover mt-2" />
+        </div>
+      )}
     </div>
   );
 }
+
+ProductImageUpload.propTypes = {
+  imageFile: PropTypes.object,
+  setImageFile: PropTypes.func.isRequired,
+  imageLoadingState: PropTypes.bool.isRequired,
+  uploadedImageUrl: PropTypes.string,
+  setUploadedImageUrl: PropTypes.func.isRequired,
+  setImageLoadingState: PropTypes.func.isRequired,
+  isEditMode: PropTypes.bool.isRequired,
+  isCustomStyling: PropTypes.bool,
+};
 
 export default ProductImageUpload;

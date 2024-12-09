@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import UserCartItemsContent from "./cart-items-content";
+import PropTypes from "prop-types";
 
 function UserCartWrapper({ cartItems, setOpenCartSheet }) {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
       </SheetHeader>
       <div className="mt-8 space-y-4">
         {cartItems && cartItems.length > 0
-          ? cartItems.map((item) => <UserCartItemsContent cartItem={item} />)
+          ? cartItems.map((item, index) => (
+              <UserCartItemsContent key={index} cartItem={item} />
+            ))
           : null}
       </div>
       <div className="mt-8 space-y-4">
@@ -47,5 +50,16 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
     </SheetContent>
   );
 }
+
+UserCartWrapper.propTypes = {
+  cartItems: PropTypes.arrayOf(
+    PropTypes.shape({
+      salePrice: PropTypes.number.isRequired,
+      price: PropTypes.number.isRequired,
+      quantity: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  setOpenCartSheet: PropTypes.func.isRequired,
+};
 
 export default UserCartWrapper;

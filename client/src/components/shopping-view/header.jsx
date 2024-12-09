@@ -78,11 +78,12 @@ function HeaderRightContent() {
   }
 
   useEffect(() => {
-    dispatch(fetchCartItems(user?.id));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+    if (user?.id) {
+      dispatch(fetchCartItems(user.id)); // Ensure cart items are fetched when user ID is available
+    }
+  }, [dispatch, user?.id]);
 
-  console.log(cartItems, "sangam");
+  const cartItemsList = cartItems?.items || []; // Ensure cartItems is always an array
 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
@@ -95,17 +96,14 @@ function HeaderRightContent() {
         >
           <ShoppingCart className="w-6 h-6 text-blue-800" />
           <span className="absolute top-[-5px] right-[2px] font-bold text-sm text-cyan-500">
-            {cartItems?.items?.length || 0}
+            {cartItemsList.length || 0} {/* Display cart item count */}
           </span>
           <span className="sr-only">User cart</span>
         </Button>
+
         <UserCartWrapper
           setOpenCartSheet={setOpenCartSheet}
-          cartItems={
-            cartItems && cartItems.items && cartItems.items.length > 0
-              ? cartItems.items
-              : []
-          }
+          cartItems={cartItemsList} // Pass updated cartItemsList
         />
       </Sheet>
 
@@ -134,6 +132,7 @@ function HeaderRightContent() {
     </div>
   );
 }
+
 
 function ShoppingHeader() {
   const { isAuthenticated } = useSelector((state) => state.auth);

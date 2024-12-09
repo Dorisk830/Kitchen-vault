@@ -1,23 +1,10 @@
+import PropTypes from "prop-types";
 import { Button } from "@/components/ui/button";
-import bannerOne from "../../assets/banner-1.webp";
-import bannerTwo from "../../assets/banner-2.webp";
-import bannerThree from "../../assets/banner-3.webp";
 import {
-  Airplay,
-  BabyIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  CloudLightning,
-  Heater,
-  Images,
-  Shirt,
-  ShirtIcon,
-  ShoppingBasket,
-  UmbrellaIcon,
-  WashingMachine,
-  WatchIcon,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+} from "lucide-react"; // Only the icons you need
+
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -25,34 +12,15 @@ import {
   fetchProductDetails,
 } from "@/store/shop/products-slice";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
-import { useNavigate } from "react-router-dom";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import { getFeatureImages } from "@/store/common-slice";
 
-const categoriesWithIcon = [
-  { id: "electronics", label: "Electronics", icon: ShirtIcon },
-  { id: "dinnerset", label: "Dinnerset", icon: CloudLightning },
-  { id: "nonstick", label: "Nonstick", icon: BabyIcon },
-  { id: "racks", label: "Racks", icon: WatchIcon },
-  { id: "fridge", label: "Fridge", icon: UmbrellaIcon },
-];
-
-const brandsWithIcon = [
-  { id: "casserole", label: "Casserole", icon: Shirt },
-  { id: "stainless", label: "Stainless", icon: WashingMachine },
-  { id: "vitron", label: "Vitron", icon: ShoppingBasket },
-  { id: "signature", label: "Signature", icon: Airplay },
-  { id: "silicone", label: "Silicone", icon: Images },
-  { id: "Redberry", label: "Redberry", icon: Heater },
-];
-
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { productList, productDetails } = useSelector(
-    (state) => state.shopProducts
-  );
+  // Destructure productList from Redux store
+  const { productList, productDetails } = useSelector((state) => state.shopProducts);
   const { featureImageList } = useSelector((state) => state.commonFeature);
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
@@ -60,18 +28,7 @@ function ShoppingHome() {
   const { user } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { toast } = useToast();
-
-  function handleNavigateToListingPage(getCurrentItem, section) {
-    sessionStorage.removeItem("filters");
-    const currentFilter = {
-      [section]: [getCurrentItem.id],
-    };
-
-    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
-    navigate(`/shop/listing`);
-  }
 
   function handleGetProductDetails(getCurrentProductId) {
     dispatch(fetchProductDetails(getCurrentProductId));
@@ -115,8 +72,6 @@ function ShoppingHome() {
     );
   }, [dispatch]);
 
-  console.log(productList, "productList");
-
   useEffect(() => {
     dispatch(getFeatureImages());
   }, [dispatch]);
@@ -124,17 +79,16 @@ function ShoppingHome() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="relative w-full h-[600px] overflow-hidden">
-        {featureImageList && featureImageList.length > 0
-          ? featureImageList.map((slide, index) => (
-              <img
-                src={slide?.image}
-                key={index}
-                className={`${
-                  index === currentSlide ? "opacity-100" : "opacity-0"
-                } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
-              />
-            ))
-          : null}
+        {featureImageList &&
+          featureImageList.map((slide, index) => (
+            <img
+              src={slide?.image}
+              key={index}
+              className={`${
+                index === currentSlide ? "opacity-100" : "opacity-0"
+              } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
+            />
+          ))}
         <Button
           variant="outline"
           size="icon"
@@ -168,15 +122,19 @@ function ShoppingHome() {
             Feature Products
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {productList && productList.length > 0
-              ? productList.map((productItem) => (
-                  <ShoppingProductTile
-                    handleGetProductDetails={handleGetProductDetails}
-                    product={productItem}
-                    handleAddtoCart={handleAddtoCart}
-                  />
-                ))
-              : null}
+            {/* Ensure productList is defined and has data */}
+            {productList && productList.length > 0 ? (
+              productList.map((productItem, index) => (
+                <ShoppingProductTile
+                  key={productItem.id || `${productItem.name}-${productItem.sku}-${index}`}
+                  handleGetProductDetails={handleGetProductDetails}
+                  product={productItem}
+                  handleAddtoCart={handleAddtoCart}
+                />
+              ))
+            ) : (
+              <p>No products available</p> // Fallback message if productList is empty
+            )}
           </div>
         </div>
       </section>
@@ -188,5 +146,20 @@ function ShoppingHome() {
     </div>
   );
 }
+
+ShoppingHome.propTypes = {
+  productList: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+      price: PropTypes.number.isRequired,
+    })
+  ),
+  featureImageList: PropTypes.arrayOf(
+    PropTypes.shape({
+      image: PropTypes.string.isRequired,
+    })
+  ),
+};
 
 export default ShoppingHome;

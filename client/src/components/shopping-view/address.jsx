@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import CommonForm from "../common/form";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { addressFormControls } from "@/config";
@@ -6,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addNewAddress,
   deleteAddress,
-  editaAddress,
+  editAddress,
   fetchAllAddresses,
 } from "@/store/shop/address-slice";
 import AddressCard from "./address-card";
@@ -43,7 +44,7 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
 
     currentEditedId !== null
       ? dispatch(
-          editaAddress({
+          editAddress({
             userId: user?.id,
             addressId: currentEditedId,
             formData,
@@ -106,25 +107,30 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
   }
 
   useEffect(() => {
-    dispatch(fetchAllAddresses(user?.id));
-  }, [dispatch]);
+    if (user?.id) {
+        dispatch(fetchAllAddresses(user.id));
+    }
+}, [dispatch, user?.id]);
+
 
   console.log(addressList, "addressList");
 
   return (
     <Card>
       <div className="mb-5 p-3 grid grid-cols-1 sm:grid-cols-2  gap-2">
-        {addressList && addressList.length > 0
-          ? addressList.map((singleAddressItem) => (
-              <AddressCard
-                selectedId={selectedId}
-                handleDeleteAddress={handleDeleteAddress}
-                addressInfo={singleAddressItem}
-                handleEditAddress={handleEditAddress}
-                setCurrentSelectedAddress={setCurrentSelectedAddress}
-              />
-            ))
-          : null}
+      {addressList && addressList.length > 0
+  ? addressList.map((singleAddressItem, index) => (
+      <AddressCard
+        key={singleAddressItem._id || index}
+        selectedId={selectedId}
+        handleDeleteAddress={handleDeleteAddress}
+        addressInfo={singleAddressItem}
+        handleEditAddress={handleEditAddress}
+        setCurrentSelectedAddress={setCurrentSelectedAddress}
+      />
+    ))
+  : null}
+
       </div>
       <CardHeader>
         <CardTitle>
@@ -144,5 +150,11 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
     </Card>
   );
 }
+
+Address.propTypes = {
+  setCurrentSelectedAddress: PropTypes.func.isRequired,
+  selectedId: PropTypes.string,
+};
+
 
 export default Address;

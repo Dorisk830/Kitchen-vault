@@ -110,18 +110,20 @@ function AdminProducts() {
         </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {productList && productList.length > 0
-          ? productList.map((productItem) => (
-              <AdminProductTile
-                setFormData={setFormData}
-                setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-                setCurrentEditedId={setCurrentEditedId}
-                product={productItem}
-                handleDelete={handleDelete}
-              />
-            ))
-          : null}
-      </div>
+  {productList && productList.length > 0
+    ? productList.map((productItem) => (
+        <AdminProductTile
+          key={productItem.id || productItem._id} // Use a unique identifier here
+          setFormData={setFormData}
+          setOpenCreateProductsDialog={setOpenCreateProductsDialog}
+          setCurrentEditedId={setCurrentEditedId}
+          product={productItem}
+          handleDelete={handleDelete}
+        />
+      ))
+    : null}
+</div>
+
       <Sheet
         open={openCreateProductsDialog}
         onOpenChange={() => {

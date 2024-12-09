@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "@/store/auth-slice";
 
-function AdminHeader({ setOpen }) {
+function AdminHeader({setOpen }) {
   const dispatch = useDispatch();
 
   function handleLogout() {
