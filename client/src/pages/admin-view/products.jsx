@@ -26,7 +26,7 @@ const initialFormData = {
   category: "",
   brand: "",
   price: "",
-  salePrice: "",
+  salePrice: null,
   totalStock: "",
   averageReview: 0,
 };
@@ -39,13 +39,30 @@ function AdminProducts() {
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [setFormErrors] = useState({});
 
   const { productList } = useSelector((state) => state.adminProducts);
   const dispatch = useDispatch();
   const { toast } = useToast();
 
+  function validateForm() {
+    const errors = {};
+    if (!formData.title) errors.title = "Title is required";
+    if (!formData.price) errors.price = "Price is required";
+    if (!formData.totalStock) errors.totalStock = "Total stock is required";
+    if (!uploadedImageUrl) errors.image = "Image is required";  // Image validation
+
+    setFormErrors(errors);
+    return Object.keys(formData)
+    .filter((currentKey) => currentKey !== "averageReview")
+    .map((key) => formData[key] !== "")
+    .every((item) => item) && uploadedImageUrl;
+  }
+
   function onSubmit(event) {
     event.preventDefault();
+
+    if (!validateForm()) return;
 
     currentEditedId !== null
       ? dispatch(
@@ -75,7 +92,7 @@ function AdminProducts() {
             setImageFile(null);
             setFormData(initialFormData);
             toast({
-              title: "Product add successfully",
+              title: "Product added successfully",
             });
           }
         });

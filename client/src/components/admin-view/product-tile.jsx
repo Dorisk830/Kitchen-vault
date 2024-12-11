@@ -30,7 +30,7 @@ function AdminProductTile({
               Kes:{product?.price}
             </span>
             {product?.salePrice > 0 ? (
-              <span className="text-lg font-bold">${product?.salePrice}</span>
+              <span className="text-lg font-bold">Kes:{product?.salePrice}</span>
             ) : null}
           </div>
         </CardContent>
@@ -57,7 +57,7 @@ AdminProductTile.propTypes = {
     image: PropTypes.string,
     title: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
-    salePrice: PropTypes.number,
+    salePrice: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([null])]),
   }).isRequired,
   setFormData: PropTypes.func.isRequired,
   setOpenCreateProductsDialog: PropTypes.func.isRequired,
