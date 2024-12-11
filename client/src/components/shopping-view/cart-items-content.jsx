@@ -1,3 +1,4 @@
+import PropTypes from "prop-types"; // Import PropTypes for validation
 import { Minus, Plus, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,8 +12,14 @@ function UserCartItemsContent({ cartItem }) {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
+  // Check if cartItem is missing critical properties (like _id)
+  if (!cartItem || !cartItem._id) {
+    console.error("Invalid cartItem object", cartItem);
+    return null; // Or you can return a fallback UI
+  }
+
   function handleUpdateQuantity(getCartItem, typeOfAction) {
-    if (typeOfAction == "plus") {
+    if (typeOfAction === "plus") {
       let getCartItems = cartItems.items || [];
 
       if (getCartItems.length) {
@@ -99,13 +106,13 @@ function UserCartItemsContent({ cartItem }) {
             onClick={() => handleUpdateQuantity(cartItem, "plus")}
           >
             <Plus className="w-4 h-4" />
-            <span className="sr-only">Decrease</span>
+            <span className="sr-only">Increase</span>
           </Button>
         </div>
       </div>
       <div className="flex flex-col items-end">
         <p className="font-semibold">
-          $
+          Kes:
           {(
             (cartItem?.salePrice > 0 ? cartItem?.salePrice : cartItem?.price) *
             cartItem?.quantity
@@ -120,5 +127,18 @@ function UserCartItemsContent({ cartItem }) {
     </div>
   );
 }
+
+// Prop validation using PropTypes
+UserCartItemsContent.propTypes = {
+  cartItem: PropTypes.shape({
+    _id: PropTypes.string, // _id is now optional
+    productId: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    quantity: PropTypes.number.isRequired,
+    salePrice: PropTypes.number,
+    price: PropTypes.number.isRequired,
+  }).isRequired,
+};
 
 export default UserCartItemsContent;

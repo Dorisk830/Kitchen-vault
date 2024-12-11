@@ -45,21 +45,21 @@ function ProductImageUpload({
     }
   }
 
-  async function uploadImageToCloudinary() {
+  async function uploadImageToCloudinary(imageFile, setUploadedImageUrl, setImageLoadingState) {
     if (!imageFile) return;
-
+  
     setImageLoadingState(true);
     const data = new FormData();
     data.append("my_file", imageFile);
-
+  
     try {
       const response = await axios.post(
         "http://localhost:5000/api/admin/products/upload-image",
         data
       );
-
+  
       if (response?.data?.success) {
-        setUploadedImageUrl(response.data.result.url); // Set the uploaded image URL
+        setUploadedImageUrl(response.data.result.url); 
       }
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -67,10 +67,14 @@ function ProductImageUpload({
       setImageLoadingState(false);
     }
   }
+  
 
   useEffect(() => {
-    if (imageFile !== null) uploadImageToCloudinary();
-  }, [imageFile]);
+    if (imageFile !== null) {
+      uploadImageToCloudinary(imageFile, setUploadedImageUrl, setImageLoadingState);
+    }
+  }, [imageFile, setUploadedImageUrl, setImageLoadingState]);
+  
 
   useEffect(() => {
     if (uploadedImageUrl) {

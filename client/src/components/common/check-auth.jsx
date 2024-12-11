@@ -33,7 +33,6 @@ function CheckAuth({ isAuthenticated, user, children }) {
   return <>{children}</>;
 }
 
-// Prop Types
 CheckAuth.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
   user: PropTypes.shape({

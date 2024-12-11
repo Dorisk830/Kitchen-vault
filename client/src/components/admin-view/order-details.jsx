@@ -11,6 +11,7 @@ import {
   updateOrderStatus,
 } from "@/store/admin/order-slice";
 import { useToast } from "../ui/use-toast";
+import PropTypes from "prop-types";
 
 const initialFormData = {
   status: "",
@@ -21,8 +22,6 @@ function AdminOrderDetailsView({ orderDetails }) {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const { toast } = useToast();
-
-  console.log(orderDetails, "orderDetailsorderDetails");
 
   function handleUpdateStatus(event) {
     event.preventDefault();
@@ -56,7 +55,7 @@ function AdminOrderDetailsView({ orderDetails }) {
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Price</p>
-            <Label>${orderDetails?.totalAmount}</Label>
+            <Label>Kes{orderDetails?.totalAmount}</Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Payment method</p>
@@ -89,11 +88,14 @@ function AdminOrderDetailsView({ orderDetails }) {
             <div className="font-medium">Order Details</div>
             <ul className="grid gap-3">
               {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
-                ? orderDetails?.cartItems.map((item) => (
-                    <li className="flex items-center justify-between">
+                ? orderDetails.cartItems.map((item, index) => (
+                    <li
+                      key={item.id || `${item.title}-${index}`}
+                      className="flex items-center justify-between"
+                    >
                       <span>Title: {item.title}</span>
                       <span>Quantity: {item.quantity}</span>
-                      <span>Price: ${item.price}</span>
+                      <span>Price: Kes.{item.price}</span>
                     </li>
                   ))
                 : null}
@@ -140,5 +142,31 @@ function AdminOrderDetailsView({ orderDetails }) {
     </DialogContent>
   );
 }
+
+// PropTypes for validation
+AdminOrderDetailsView.propTypes = {
+  orderDetails: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    orderDate: PropTypes.string.isRequired,
+    totalAmount: PropTypes.number.isRequired,
+    paymentMethod: PropTypes.string.isRequired,
+    paymentStatus: PropTypes.string.isRequired,
+    orderStatus: PropTypes.string.isRequired,
+    cartItems: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        quantity: PropTypes.number.isRequired,
+        price: PropTypes.number.isRequired,
+      })
+    ),
+    addressInfo: PropTypes.shape({
+      address: PropTypes.string,
+      city: PropTypes.string,
+      pincode: PropTypes.string,
+      phone: PropTypes.string,
+      notes: PropTypes.string,
+    }),
+  }).isRequired,
+};
 
 export default AdminOrderDetailsView;

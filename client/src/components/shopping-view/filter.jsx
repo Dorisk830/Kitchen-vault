@@ -1,4 +1,4 @@
-/* eslint-disable react/jsx-key */
+import PropTypes from 'prop-types'; 
 import { filterOptions } from "@/config";
 import { Fragment } from "react";
 import { Label } from "../ui/label";
@@ -13,18 +13,17 @@ function ProductFilter({ filters, handleFilter }) {
       </div>
       <div className="p-4 space-y-4">
         {Object.keys(filterOptions).map((keyItem) => (
-          <Fragment>
+          <Fragment key={keyItem}>
             <div>
               <h3 className="text-base font-bold">{keyItem}</h3>
               <div className="grid gap-2 mt-2">
                 {filterOptions[keyItem].map((option) => (
-                  <Label className="flex font-medium items-center gap-2 ">
+                  <Label key={option.id} className="flex font-medium items-center gap-2">
                     <Checkbox
                       checked={
                         filters &&
                         Object.keys(filters).length > 0 &&
                         filters[keyItem] &&
-                        // eslint-disable-next-line react/prop-types
                         filters[keyItem].indexOf(option.id) > -1
                       }
                       onCheckedChange={() => handleFilter(keyItem, option.id)}
@@ -41,5 +40,11 @@ function ProductFilter({ filters, handleFilter }) {
     </div>
   );
 }
+
+// Prop validation using PropTypes
+ProductFilter.propTypes = {
+  filters: PropTypes.object.isRequired, // The filters prop should be an object
+  handleFilter: PropTypes.func.isRequired, // The handleFilter prop should be a function
+};
 
 export default ProductFilter;

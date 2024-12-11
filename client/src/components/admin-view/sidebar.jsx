@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import {
   BadgeCheck,
   ChartNoAxesCombined,
@@ -51,6 +52,10 @@ function MenuItems({ setOpen }) {
   );
 }
 
+MenuItems.propTypes = {
+  setOpen: PropTypes.func,
+};
+
 function AdminSideBar({ open, setOpen }) {
   const navigate = useNavigate();
 
@@ -82,5 +87,10 @@ function AdminSideBar({ open, setOpen }) {
     </Fragment>
   );
 }
+
+AdminSideBar.propTypes = {
+  open: PropTypes.bool.isRequired,
+  setOpen: PropTypes.func.isRequired,
+};
 
 export default AdminSideBar;

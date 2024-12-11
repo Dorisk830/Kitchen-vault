@@ -30,8 +30,10 @@ function ShoppingOrders() {
   }
 
   useEffect(() => {
-    dispatch(getAllOrdersByUserId(user?.id));
-  }, [dispatch]);
+    if (user?.id) {
+      dispatch(getAllOrdersByUserId(user?.id));
+    }
+  }, [dispatch, user?.id]); // Added user?.id to the dependency array
 
   useEffect(() => {
     if (orderDetails !== null) setOpenDetailsDialog(true);
@@ -60,8 +62,7 @@ function ShoppingOrders() {
           <TableBody>
             {orderList && orderList.length > 0
               ? orderList.map((orderItem) => (
-                  // eslint-disable-next-line react/jsx-key
-                  <TableRow>
+                  <TableRow key={orderItem?._id}> {/* Added key prop here */}
                     <TableCell>{orderItem?._id}</TableCell>
                     <TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
                     <TableCell>
@@ -77,7 +78,7 @@ function ShoppingOrders() {
                         {orderItem?.orderStatus}
                       </Badge>
                     </TableCell>
-                    <TableCell>${orderItem?.totalAmount}</TableCell>
+                    <TableCell>Kes:{orderItem?.totalAmount}</TableCell>
                     <TableCell>
                       <Dialog
                         open={openDetailsDialog}

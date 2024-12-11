@@ -23,7 +23,7 @@ function ShoppingOrderDetailsView({ orderDetails }) {
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Price</p>
-            <Label>${orderDetails?.totalAmount}</Label>
+            <Label>Kes:{orderDetails?.totalAmount}</Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Payment method</p>
@@ -58,12 +58,12 @@ function ShoppingOrderDetailsView({ orderDetails }) {
   {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
     ? orderDetails?.cartItems.map((item, index) => (
         <li 
-          key={item.id || item._id || index} // Ensure a unique key
+          key={item.id || item._id || index} 
           className="flex items-center justify-between"
         >
           <span>Title: {item.title}</span>
           <span>Quantity: {item.quantity}</span>
-          <span>Price: ${item.price}</span>
+          <span>Price: Kes: {item.price}</span>
         </li>
       ))
     : null}

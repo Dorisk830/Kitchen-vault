@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Label } from "../ui/label";
@@ -36,5 +37,23 @@ function AddressCard({
     </Card>
   );
 }
+
+// Prop validation using PropTypes
+AddressCard.propTypes = {
+  addressInfo: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+    city: PropTypes.string.isRequired,
+    pincode: PropTypes.string.isRequired,
+    phone: PropTypes.string.isRequired,
+    notes: PropTypes.string,
+  }).isRequired,
+  handleDeleteAddress: PropTypes.func.isRequired,
+  handleEditAddress: PropTypes.func.isRequired,
+  setCurrentSelectedAddress: PropTypes.func,
+  selectedId: PropTypes.shape({
+    _id: PropTypes.string,
+  }),
+};
 
 export default AddressCard;
