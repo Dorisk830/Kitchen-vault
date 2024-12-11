@@ -55,7 +55,7 @@ function AdminOrderDetailsView({ orderDetails }) {
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Price</p>
-            <Label>Kes{orderDetails?.totalAmount}</Label>
+            <Label>Kes:{orderDetails?.totalAmount}</Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Payment method</p>
@@ -95,7 +95,7 @@ function AdminOrderDetailsView({ orderDetails }) {
                     >
                       <span>Title: {item.title}</span>
                       <span>Quantity: {item.quantity}</span>
-                      <span>Price: Kes.{item.price}</span>
+                      <span>Price: Kes:{item.price}</span>
                     </li>
                   ))
                 : null}
