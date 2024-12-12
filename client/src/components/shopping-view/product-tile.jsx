@@ -1,7 +1,7 @@
-/* eslint-disable react/prop-types */
+import PropTypes from 'prop-types';  // Import PropTypes
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
-import { brandOptionsMap, categoryOptionsMap } from "@/config";
+import { categoryOptionsMap } from "@/config";
 import { Badge } from "../ui/badge";
 
 function ShoppingProductTile({
@@ -38,9 +38,6 @@ function ShoppingProductTile({
             <span className="text-[16px] text-muted-foreground">
               {categoryOptionsMap[product?.category]}
             </span>
-            <span className="text-[16px] text-muted-foreground">
-              {brandOptionsMap[product?.brand]}
-            </span>
           </div>
           <div className="flex justify-between items-center mb-2">
             <span
@@ -75,5 +72,20 @@ function ShoppingProductTile({
     </Card>
   );
 }
+
+// PropTypes validation
+ShoppingProductTile.propTypes = {
+  product: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    salePrice: PropTypes.number,
+    category: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    totalStock: PropTypes.number.isRequired,
+  }).isRequired,
+  handleGetProductDetails: PropTypes.func.isRequired,
+  handleAddtoCart: PropTypes.func.isRequired,
+};
 
 export default ShoppingProductTile;

@@ -66,19 +66,6 @@ export const registerFormControls = [
       ],
     },
     {
-      label: "Brand",
-      name: "brand",
-      componentType: "select",
-      options: [
-        { id: "casserole", label: "Casserole" },
-        { id: "stainless", label: "Stainless" },
-        { id: "vitron", label: "Vitron" },
-        { id: "signature", label: "Signature" },
-        { id: "silicone", label: "Silicone" },
-        { id: "redberry", label: "Redberry" },
-      ],
-    },
-    {
       label: "Price",
       name: "price",
       componentType: "input",
@@ -152,15 +139,6 @@ export const registerFormControls = [
     fridge: "Fridge",
   };
   
-  export const brandOptionsMap = {
-    casserole: "Casserole",
-    stainless: "Stainless",
-    vitron: "Vitron",
-    signature: "Signature",
-    silicone: "Silicone",
-    redberry: "Redberry",
-  };
-  
   export const filterOptions = {
     category: [
       { id: "electronics", label: "Electronics" },
@@ -168,14 +146,6 @@ export const registerFormControls = [
       { id: "nonstick", label: "Nonstick" },
       { id: "racks", label: "Racks" },
       { id: "fridge", label: "Fridge" },
-    ],
-    brand: [
-      { id: "casserole", label: "Casserole" },
-      { id: "stainless", label: "Stainless" },
-      { id: "vitron", label: "Vitron" },
-      { id: "signature", label: "Signature" },
-      { id: "silicone", label: "Silicone" },
-      { id: "redberry", label: "Redberry" },
     ],
   };
   

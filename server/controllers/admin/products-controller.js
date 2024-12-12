@@ -29,7 +29,6 @@ const addProduct = async (req, res) => {
       title,
       description,
       category,
-      brand,
       price,
       salePrice, // Optional field
       totalStock,
@@ -43,7 +42,6 @@ const addProduct = async (req, res) => {
       title,
       description,
       category,
-      brand,
       price,
       salePrice: salePrice || null, // If no salePrice is provided, set it to null
       totalStock,
@@ -90,7 +88,6 @@ const editProduct = async (req, res) => {
       title,
       description,
       category,
-      brand,
       price,
       salePrice, // Optional field
       totalStock,
@@ -107,7 +104,6 @@ const editProduct = async (req, res) => {
       findProduct.title = title || findProduct.title;
       findProduct.description = description || findProduct.description;
       findProduct.category = category || findProduct.category;
-      findProduct.brand = brand || findProduct.brand;
       findProduct.price = price === "" || price === undefined ? findProduct.price : price;
       findProduct.salePrice = salePrice === "" || salePrice === undefined ? null : salePrice; // Handle optional salePrice
       findProduct.totalStock = totalStock || findProduct.totalStock;
