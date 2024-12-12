@@ -23,6 +23,8 @@ function CommonForm({
     let element = null;
     const value = formData[getControlItem.name] || "";
 
+    const inputClass = "placeholder-green-800 border-gray-300 focus:border-green-500 text-green-800"; // Green placeholder, border, and text
+
     switch (getControlItem.componentType) {
       case "input":
         element = (
@@ -32,6 +34,7 @@ function CommonForm({
             id={getControlItem.name}
             type={getControlItem.type}
             value={value}
+            className={`${inputClass} focus:ring-green-500`} // Green text, border, and ring on focus
             onChange={(event) =>
               setFormData({
                 ...formData,
@@ -73,6 +76,7 @@ function CommonForm({
             name={getControlItem.name}
             placeholder={getControlItem.placeholder}
             id={getControlItem.id}
+            className={`${inputClass} focus:ring-green-500`} // Green text, placeholder, and ring
             value={value}
             onChange={(event) =>
               setFormData({
@@ -91,6 +95,7 @@ function CommonForm({
             id={getControlItem.name}
             type={getControlItem.type}
             value={value}
+            className={`${inputClass} focus:ring-green-500`} // Green text, border, and ring on focus
             onChange={(event) =>
               setFormData({
                 ...formData,
@@ -110,7 +115,8 @@ function CommonForm({
       <div className="flex flex-col gap-3">
         {formControls.map((controlItem) => (
           <div className="grid w-full gap-1.5" key={controlItem.name}>
-            <Label className="mb-1">{controlItem.label}</Label>
+            {/* Apply bold and green color to the label */}
+            <Label className="mb-1 text-green-800 font-bold">{controlItem.label}</Label>
             {renderInputsByComponentType(controlItem)}
           </div>
         ))}
