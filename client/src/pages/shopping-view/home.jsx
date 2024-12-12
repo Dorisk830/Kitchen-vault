@@ -30,16 +30,11 @@ function ShoppingHome() {
 
   function handleAddtoCart(getCurrentProductId) {
     if (!user) {
-      // Show toast with a "Log In" button
-      toast({
-        title: "Please log in to add products to the cart.",
-        action: (
-          <Button onClick={() => navigate('/auth/login')}>Log In</Button>
-        ),
-      });
+      // If user is not logged in, navigate to the login page directly
+      navigate('/auth/login');
       return;
     }
-
+  
     dispatch(
       addToCart({
         userId: user?.id,
@@ -50,11 +45,12 @@ function ShoppingHome() {
       if (data?.payload?.success) {
         dispatch(fetchCartItems(user?.id));
         toast({
-          title: "Product is added to cart",
+          title: "Product is added to cart",        
         });
       }
     });
   }
+  
 
   useEffect(() => {
     if (productDetails !== null) setOpenDetailsDialog(true);

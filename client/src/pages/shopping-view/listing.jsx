@@ -19,7 +19,7 @@ import {
 import { ArrowUpDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom"; // Importing useNavigate for redirection
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -32,8 +32,6 @@ function createSearchParamsHelper(filterParams) {
     }
   }
 
-  console.log(queryParams, "queryParams");
-
   return queryParams.join("&");
 }
 
@@ -43,12 +41,13 @@ function ShoppingListing() {
     (state) => state.shopProducts
   );
   const { cartItems } = useSelector((state) => state.shopCart);
-  const { user } = useSelector((state) => state.auth);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate(); // Initialize navigate
 
   const categorySearchParam = searchParams.get("category");
 
@@ -57,34 +56,41 @@ function ShoppingListing() {
   }
 
   function handleFilter(getSectionId, getCurrentOption) {
-    let cpyFilters = { ...filters };
-    const indexOfCurrentSection = Object.keys(cpyFilters).indexOf(getSectionId);
-
-    if (indexOfCurrentSection === -1) {
-      cpyFilters = {
-        ...cpyFilters,
-        [getSectionId]: [getCurrentOption],
-      };
-    } else {
-      const indexOfCurrentOption =
-        cpyFilters[getSectionId].indexOf(getCurrentOption);
-
-      if (indexOfCurrentOption === -1)
-        cpyFilters[getSectionId].push(getCurrentOption);
-      else cpyFilters[getSectionId].splice(indexOfCurrentOption, 1);
-    }
-
-    setFilters(cpyFilters);
-    sessionStorage.setItem("filters", JSON.stringify(cpyFilters));
+    setFilters((prevFilters) => {
+      const cpyFilters = { ...prevFilters };
+  
+      const indexOfCurrentSection = Object.keys(cpyFilters).indexOf(getSectionId);
+  
+      if (indexOfCurrentSection === -1) {
+        cpyFilters[getSectionId] = [getCurrentOption];
+      } else {
+        const indexOfCurrentOption =
+          cpyFilters[getSectionId].indexOf(getCurrentOption);
+  
+        if (indexOfCurrentOption === -1) {
+          cpyFilters[getSectionId].push(getCurrentOption);
+        } else {
+          cpyFilters[getSectionId].splice(indexOfCurrentOption, 1);
+        }
+      }
+  
+      return cpyFilters; // Return the new filters state
+    });
+    sessionStorage.setItem("filters", JSON.stringify(filters));
   }
+  
 
   function handleGetProductDetails(getCurrentProductId) {
-    console.log(getCurrentProductId);
     dispatch(fetchProductDetails(getCurrentProductId));
   }
 
+  // Updated handleAddtoCart with redirect logic
   function handleAddtoCart(getCurrentProductId, getTotalStock) {
-    console.log(cartItems);
+    if (!isAuthenticated) {
+      navigate("/auth/login"); // Redirect to login if not authenticated
+      return;
+    }
+
     let getCartItems = cartItems.items || [];
 
     if (getCartItems.length) {
@@ -122,28 +128,30 @@ function ShoppingListing() {
 
   useEffect(() => {
     setSort("price-lowtohigh");
-    setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
+
+    if (categorySearchParam) {
+      setFilters({ ...filters, category: [categorySearchParam] });
+    }
   }, [categorySearchParam]);
 
   useEffect(() => {
-    if (filters && Object.keys(filters).length > 0) {
-      const createQueryString = createSearchParamsHelper(filters);
-      setSearchParams(new URLSearchParams(createQueryString));
+    if (filters && Object.keys(filters).length !== 0) {
+      const filtersQueryParams = createSearchParamsHelper(filters);
+      setSearchParams(filtersQueryParams);
     }
   }, [filters, setSearchParams]);
 
   useEffect(() => {
-    if (filters !== null && sort !== null)
+    if (filters && Object.keys(filters).length !== 0) {
       dispatch(
         fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
       );
-  }, [dispatch, sort, filters]);
+    }
+  }, [dispatch, filters, sort]);
 
   useEffect(() => {
     if (productDetails !== null) setOpenDetailsDialog(true);
   }, [productDetails]);
-
-  console.log(productList, "productListproductListproductList");
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
@@ -183,10 +191,9 @@ function ShoppingListing() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
           {productList.map((productItem) => {
-            console.log(productItem.id); // Log the id for inspection
             return (
               <ShoppingProductTile
-                key={productItem.id} // Use id exclusively for the key
+                key={productItem.id}
                 handleGetProductDetails={handleGetProductDetails}
                 product={productItem}
                 handleAddtoCart={handleAddtoCart}
