@@ -128,18 +128,29 @@ function ShoppingListing() {
 
   useEffect(() => {
     setSort("price-lowtohigh");
-
+  
     if (categorySearchParam) {
-      setFilters({ ...filters, category: [categorySearchParam] });
+      setFilters((prevFilters) => {
+        return { ...prevFilters, category: [categorySearchParam] };
+      });
     }
   }, [categorySearchParam]);
-
+  
   useEffect(() => {
     if (filters && Object.keys(filters).length !== 0) {
       const filtersQueryParams = createSearchParamsHelper(filters);
       setSearchParams(filtersQueryParams);
     }
   }, [filters, setSearchParams]);
+  
+  useEffect(() => {
+    if (filters && Object.keys(filters).length !== 0) {
+      dispatch(
+        fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
+      );
+    }
+  }, [dispatch, filters, sort]); // Ensure `filters` is updated correctly before using it
+  
 
   useEffect(() => {
     if (filters && Object.keys(filters).length !== 0) {
