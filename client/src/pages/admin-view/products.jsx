@@ -38,7 +38,7 @@ function AdminProducts() {
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
-  const [setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState({});
 
   const { productList } = useSelector((state) => state.adminProducts);
   const dispatch = useDispatch();
@@ -52,71 +52,102 @@ function AdminProducts() {
     if (!uploadedImageUrl) errors.image = "Image is required";  // Image validation
 
     setFormErrors(errors);
-    return Object.keys(formData)
-    .filter((currentKey) => currentKey !== "averageReview")
-    .map((key) => formData[key] !== "")
-    .every((item) => item) && uploadedImageUrl;
+    return Object.keys(errors).length === 0; // Form is valid if there are no errors
   }
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      toast({
+        title: "Form validation failed",
+        description: "Please fix the errors and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    currentEditedId !== null
-      ? dispatch(
-          editProduct({
-            id: currentEditedId,
-            formData,
-          })
-        ).then((data) => {
-          console.log(data, "edit");
+    const productData = {
+      ...formData,
+      image: uploadedImageUrl,
+    };
 
+    if (currentEditedId !== null) {
+      dispatch(editProduct({ id: currentEditedId, formData: productData }))
+        .then((data) => {
           if (data?.payload?.success) {
             dispatch(fetchAllProducts());
             setFormData(initialFormData);
             setOpenCreateProductsDialog(false);
             setCurrentEditedId(null);
+            toast({ title: "Product updated successfully" });
           }
         })
-      : dispatch(
-          addNewProduct({
-            ...formData,
-            image: uploadedImageUrl,
-          })
-        ).then((data) => {
+        .catch(() => {
+          toast({
+            title: "Error",
+            description: "Failed to update the product.",
+            variant: "destructive",
+          });
+        });
+    } else {
+      dispatch(addNewProduct(productData))
+        .then((data) => {
           if (data?.payload?.success) {
             dispatch(fetchAllProducts());
             setOpenCreateProductsDialog(false);
             setImageFile(null);
             setFormData(initialFormData);
+            setUploadedImageUrl(""); // Reset image URL
+            toast({ title: "Product added successfully" });
+          } else {
             toast({
-              title: "Product added successfully",
+              title: "Error",
+              description: "Failed to add the product.",
+              variant: "destructive",
             });
           }
+        })
+        .catch(() => {
+          toast({
+            title: "Error",
+            description: "Something went wrong while adding the product.",
+            variant: "destructive",
+          });
         });
+    }
   }
 
   function handleDelete(getCurrentProductId) {
-    dispatch(deleteProduct(getCurrentProductId)).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(fetchAllProducts());
-      }
-    });
+    dispatch(deleteProduct(getCurrentProductId))
+      .then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllProducts());
+          toast({ title: "Product deleted successfully" });
+        }
+      })
+      .catch(() => {
+        toast({
+          title: "Error",
+          description: "Failed to delete the product.",
+          variant: "destructive",
+        });
+      });
   }
 
   function isFormValid() {
-    return Object.keys(formData)
-      .filter((currentKey) => currentKey !== "averageReview")
-      .map((key) => formData[key] !== "")
-      .every((item) => item);
+    // Ensure all fields except averageReview are filled, and image is uploaded
+    return (
+      Object.keys(formData)
+        .filter((currentKey) => currentKey !== "averageReview")
+        .map((key) => formData[key] !== "")
+        .every((item) => item) && !!uploadedImageUrl
+    );
   }
 
   useEffect(() => {
     dispatch(fetchAllProducts());
   }, [dispatch]);
-
-  console.log(formData, "productList");
 
   return (
     <Fragment>
@@ -126,19 +157,19 @@ function AdminProducts() {
         </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-  {productList && productList.length > 0
-    ? productList.map((productItem) => (
-        <AdminProductTile
-          key={productItem.id || productItem._id} // Use a unique identifier here
-          setFormData={setFormData}
-          setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-          setCurrentEditedId={setCurrentEditedId}
-          product={productItem}
-          handleDelete={handleDelete}
-        />
-      ))
-    : null}
-</div>
+        {productList && productList.length > 0
+          ? productList.map((productItem) => (
+              <AdminProductTile
+                key={productItem.id || productItem._id}
+                setFormData={setFormData}
+                setOpenCreateProductsDialog={setOpenCreateProductsDialog}
+                setCurrentEditedId={setCurrentEditedId}
+                product={productItem}
+                handleDelete={handleDelete}
+              />
+            ))
+          : null}
+      </div>
 
       <Sheet
         open={openCreateProductsDialog}
@@ -146,6 +177,7 @@ function AdminProducts() {
           setOpenCreateProductsDialog(false);
           setCurrentEditedId(null);
           setFormData(initialFormData);
+          setUploadedImageUrl(""); // Reset image URL
         }}
       >
         <SheetContent side="right" className="overflow-auto">
@@ -171,6 +203,7 @@ function AdminProducts() {
               buttonText={currentEditedId !== null ? "Edit" : "Add"}
               formControls={addProductFormElements}
               isBtnDisabled={!isFormValid()}
+              formErrors={formErrors}
             />
           </div>
         </SheetContent>

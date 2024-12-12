@@ -55,7 +55,7 @@ function MenuItems() {
       {shoppingViewHeaderMenuItems.map((menuItem) => (
         <Label
           onClick={() => handleNavigate(menuItem)}
-          className="text-xl font-bold cursor-pointer text-cyan-500 hover:underline"
+          className="text-xl font-bold cursor-pointer text-green-800 hover:underline"
           key={menuItem.id}
         >
           {menuItem.label}
@@ -95,8 +95,8 @@ function HeaderRightContent() {
               size="icon"
               className="relative"
             >
-              <ShoppingCart className="w-6 h-6 text-blue-800" />
-              <span className="absolute top-[-5px] right-[2px] font-bold text-sm text-cyan-500">
+              <ShoppingCart className="w-6 h-6 text-green-800 font-extrabold" />
+              <span className="absolute top-[-5px] right-[2px] font-bold text-sm text-green-600">
                 {cartItemsList.length || 0} {/* Display cart item count */}
               </span>
               <span className="sr-only">User cart</span>
@@ -110,8 +110,8 @@ function HeaderRightContent() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar className="bg-cyan-500">
-                <AvatarFallback className="bg-cyan-500 text-white font-extrabold">
+              <Avatar className="bg-green-800">
+                <AvatarFallback className="bg-green-800 text-white font-extrabold">
                   {user?.userName[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -132,9 +132,13 @@ function HeaderRightContent() {
           </DropdownMenu>
         </>
       ) : (
-        <Button onClick={() => navigate("/auth/login")} variant="link">
+        <Button
+          onClick={() => navigate("/auth/login")}
+          variant="link"
+          className="text-green-800 font-bold text-xl"
+        >
           Login
-        </Button>
+      </Button>
       )}
     </div>
   );
@@ -142,13 +146,13 @@ function HeaderRightContent() {
 
 function ShoppingHeader() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
+    <header className="sticky top-0 z-40 w-full border-b bg-background font-bold">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         <Link to="/" className="flex items-center gap-2">
-          <HousePlug className="h-6 w-6 text-cyan-500" />
-          <span className="font-bold text-2xl text-cyan-500 group relative">
+          <HousePlug className="h-6 w-6 text-green-800" />
+          <span className="font-bold text-2xl text-green-800 group relative">
             KitchenVault
-            <span className="absolute inset-x-0 bottom-0 h-0.5 bg-cyan-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+            <span className="absolute inset-x-0 bottom-0 h-0.5 bg-green-800 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
           </span>
         </Link>
         <Sheet>
