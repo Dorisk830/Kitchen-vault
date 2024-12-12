@@ -1,32 +1,26 @@
 import PropTypes from "prop-types";
 import { Button } from "@/components/ui/button";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "lucide-react"; // Only the icons you need
-
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"; 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchAllFilteredProducts,
-  fetchProductDetails,
-} from "@/store/shop/products-slice";
+import { fetchAllFilteredProducts, fetchProductDetails } from "@/store/shop/products-slice";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import { getFeatureImages } from "@/store/common-slice";
+import { useNavigate } from "react-router-dom";
 
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  // Destructure productList from Redux store
   const { productList, productDetails } = useSelector((state) => state.shopProducts);
   const { featureImageList } = useSelector((state) => state.commonFeature);
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
+  // Get user state from Redux
   const { user } = useSelector((state) => state.auth);
-
+  const navigate = useNavigate(); // Use navigate to redirect to login
   const dispatch = useDispatch();
   const { toast } = useToast();
 
@@ -35,6 +29,17 @@ function ShoppingHome() {
   }
 
   function handleAddtoCart(getCurrentProductId) {
+    if (!user) {
+      // Show toast with a "Log In" button
+      toast({
+        title: "Please log in to add products to the cart.",
+        action: (
+          <Button onClick={() => navigate('/auth/login')}>Log In</Button>
+        ),
+      });
+      return;
+    }
+
     dispatch(
       addToCart({
         userId: user?.id,
